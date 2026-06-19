@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocabPlay Premium - Learn English with Beautiful Real Images</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .perspective-1000 { perspective: 1000px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .scrollbar-none::-webkit-scrollbar { display: none; }
+        .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between transition-colors duration-500">
+
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <!-- Header dinámico -->
+    <header id="app-header" class="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white text-center py-8 px-4 shadow-lg relative transition-all duration-500">
+        <span class="bg-white/20 text-white font-bold text-xs uppercase tracking-wider px-3 py-1 rounded-full inline-block mb-3">Vibrant ESL Interactive Engine</span>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight"><i class="fa-solid fa-graduation-cap mr-2"></i>VocabPlay English</h1>
+        <p class="text-sm md:text-base mt-2 opacity-95 max-w-xl mx-auto font-medium">Explore English vocabulary through native pronunciations, high-definition photographs, and active matching games!</p>
+    </header>
+
+    <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-8 flex flex-col items-center">
+
+        <!-- Selección de Temas -->
+        <div class="w-full mb-6">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-tags"></i> Choose a Topic
+            </h3>
+            <div class="flex gap-2 overflow-x-auto pb-3 scrollbar-none snap-x">
+                <button onclick="changeCategory('kitchen')" id="cat-kitchen" class="category-tab active snap-start flex items-center gap-2 bg-white border-2 border-transparent px-4 py-3 rounded-full text-sm font-bold shadow-sm hover:translate-y-[-1px] transition-all duration-200 text-slate-600 shrink-0 [&.active]:border-orange-500 [&.active]:text-orange-600 [&.active]:bg-orange-50/50">
+                    <i class="fa-solid fa-utensils text-orange-500 text-lg"></i> Kitchen & Food
+                </button>
+                <button onclick="changeCategory('animals')" id="cat-animals" class="category-tab snap-start flex items-center gap-2 bg-white border-2 border-transparent px-4 py-3 rounded-full text-sm font-bold shadow-sm hover:translate-y-[-1px] transition-all duration-200 text-slate-600 shrink-0 [&.active]:border-emerald-500 [&.active]:text-emerald-600 [&.active]:bg-emerald-50/50">
+                    <i class="fa-solid fa-paw text-emerald-500 text-lg"></i> Wild Animals
+                </button>
+                <button onclick="changeCategory('space')" id="cat-space" class="category-tab snap-start flex items-center gap-2 bg-white border-2 border-transparent px-4 py-3 rounded-full text-sm font-bold shadow-sm hover:translate-y-[-1px] transition-all duration-200 text-slate-600 shrink-0 [&.active]:border-purple-600 [&.active]:text-purple-600 [&.active]:bg-purple-50/50">
+                    <i class="fa-solid fa-user-astronaut text-purple-500 text-lg"></i> Outer Space
+                </button>
+                <button onclick="changeCategory('routine')" id="cat-routine" class="category-tab snap-start flex items-center gap-2 bg-white border-2 border-transparent px-4 py-3 rounded-full text-sm font-bold shadow-sm hover:translate-y-[-1px] transition-all duration-200 text-slate-600 shrink-0 [&.active]:border-rose-500 [&.active]:text-rose-600 [&.active]:bg-rose-50/50">
+                    <i class="fa-solid fa-clock text-rose-500 text-lg"></i> Daily Routine
+                </button>
+            </div>
+        </div>
+
+        <!-- Selector de modos -->
+        <div class="w-full max-w-xl bg-slate-200/60 p-1.5 rounded-full flex gap-1 mb-8">
+            <button onclick="switchMode('flashcard')" id="mode-flashcard-btn" class="flex-1 py-3 rounded-full text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 text-slate-500 [&.active]:bg-white [&.active]:text-slate-800 [&.active]:shadow-md active">
+                <i class="fa-regular fa-clone text-lg"></i> Flashcards
+            </button>
+            <button onclick="switchMode('quiz')" id="mode-quiz-btn" class="flex-1 py-3 rounded-full text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 text-slate-500 [&.active]:bg-white [&.active]:text-slate-800 [&.active]:shadow-md">
+                <i class="fa-solid fa-gamepad text-lg"></i> Practice Game
+            </button>
+        </div>
+
+        <!-- ================= MODO TARJETA ================= -->
+        <div class="game-panel w-full max-w-xl block transition-opacity duration-300" id="panel-flashcard">
+            <div class="perspective-1000 w-full h-[400px] mb-6 cursor-pointer" onclick="toggleFlip()">
+                <div class="preserve-3d duration-500 relative w-full h-full" id="flashcard">
+                    <div class="card-face backface-hidden absolute w-full h-full rounded-3xl bg-white border border-slate-100 shadow-xl flex flex-col justify-between p-6 text-center">
+                        <div class="w-full flex-1 flex flex-col items-center justify-center">
+                            <div id="flashcard-image-container" class="w-56 h-56 rounded-2xl bg-slate-100 overflow-hidden relative shadow-inner mb-4">
+                                <div id="image-loading-spinner" class="absolute inset-0 flex items-center justify-center bg-white z-10 transition-opacity duration-300">
+                                    <i class="fa-solid fa-spinner animate-spin text-3xl text-slate-400"></i>
+                                </div>
+                                <img id="flashcard-photo" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" src="" alt="Vocabulary" onload="hideSpinner()" onerror="handleImageError()">
+                            </div>
+                            <h2 class="text-4xl font-extrabold tracking-tight text-slate-800" id="word-en">Chef</h2>
+                            <span class="text-xs font-bold uppercase tracking-widest text-slate-400 mt-2">English Pronunciation</span>
+                        </div>
+                        <p class="text-xs text-slate-400"><i class="fa-solid fa-arrows-rotate"></i> Tap for translation</p>
+                    </div>
+                    <div id="flashcard-back-face" class="card-face backface-hidden rotate-y-180 absolute w-full h-full rounded-3xl bg-orange-50/20 border border-orange-100 shadow-xl flex flex-col justify-between p-6 text-center">
+                        <div class="w-full flex-1 flex flex-col items-center justify-center">
+                            <div id="backface-icon-container" class="w-24 h-24 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-6">
+                                <i class="fa-solid fa-language text-4xl"></i>
+                            </div>
+                            <h2 id="word-es" class="text-4xl font-extrabold tracking-tight text-orange-700">Cocinero/a</h2>
+                            <span id="word-es-subtitle" class="text-xs font-bold uppercase tracking-widest text-orange-500 mt-2">Spanish Translation</span>
+                        </div>
+                        <p class="text-xs text-slate-400"><i class="fa-solid fa-arrows-rotate"></i> Tap to flip back</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-4 justify-between items-center mb-6">
+                <select id="accent-selector" onchange="playClickSFX()" class="w-full sm:w-auto border border-slate-200 rounded-lg py-1.5 px-3 text-sm font-semibold bg-white">
+                    <option value="en-US">American Accent (US)</option>
+                    <option value="en-GB">British Accent (UK)</option>
+                </select>
+                <select id="speed-selector" onchange="playClickSFX()" class="w-full sm:w-auto border border-slate-200 rounded-lg py-1.5 px-3 text-sm font-semibold bg-white">
+                    <option value="0.75">Slower</option>
+                    <option value="0.9" selected>Normal</option>
+                    <option value="1.1">Faster</option>
+                </select>
+            </div>
+
+            <div class="flex items-center gap-4 w-full">
+                <button class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-4 px-6 rounded-2xl" onclick="prevWord(event)">Previous</button>
+                <button id="main-audio-btn" class="bg-orange-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg" onclick="speakCurrentWord(event)"><i class="fa-solid fa-volume-high"></i></button>
+                <button id="main-next-btn" class="flex-1 bg-orange-600 text-white font-bold py-4 px-6 rounded-2xl" onclick="nextWord(event)">Next</button>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2 mt-6">
+                <div id="flashcard-progress-bar" class="bg-orange-600 h-2 rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+            <p id="flashcard-counter" class="text-center text-xs font-semibold text-slate-400 mt-2">Card 1 of X</p>
+        </div>
+
+        <!-- ================= MODO QUIZ ================= -->
+        <div class="game-panel w-full max-w-xl hidden transition-opacity duration-300" id="panel-quiz">
+            <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-xl text-center">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+                    <span id="quiz-score" class="text-sm font-bold px-3 py-1.5 rounded-full">Score: 0</span>
+                    <button id="quiz-audio-btn" class="text-white rounded-full w-10 h-10 flex items-center justify-center shadow-md" onclick="speakQuizWord()"><i class="fa-solid fa-volume-high text-sm"></i></button>
+                    <span id="quiz-streak" class="text-sm font-bold px-3 py-1.5 rounded-full">Streak: 🔥 0</span>
+                </div>
+                <h2 id="quiz-question-word" class="text-4xl font-extrabold text-slate-800 mt-2 mb-6">...</h2>
+                <div class="grid grid-cols-2 gap-4" id="options-container"></div>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2 mt-6">
+                <div id="quiz-progress-bar" class="h-2 rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+            <p id="quiz-counter" class="text-center text-xs font-semibold text-slate-400 mt-2">Question 1 of X</p>
+        </div>
+    </main>
+
+    <!-- Modal Celebración -->
+    <div id="celebration-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center transform scale-90 transition-transform duration-300" id="modal-box">
+            <div id="modal-emoji-frame" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl animate-bounce">🎉</div>
+            <h3 class="text-2xl font-black text-slate-800">Excellent!</h3>
+            <p class="text-slate-500 mt-2" id="modal-message"></p>
+            <button id="modal-close-btn" onclick="closeModal()" class="w-full mt-6 text-white font-extrabold py-4 px-6 rounded-2xl shadow-lg">Try another topic</button>
+        </div>
+    </div>
+
+    <footer class="text-center py-6 px-4 text-xs font-medium text-slate-400 bg-white border-t border-slate-100">
+        <p>&copy; 2026 VocabPlay. Premium ESL Visual Engine.</p>
+    </footer>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSynthSound(freqs, duration, type = 'sine', delayBetween = 0) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            freqs.forEach((freq, index) => {
+                setTimeout(() => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(); osc.stop(audioCtx.currentTime + duration);
+                }, index * delayBetween * 1000);
+            });
+        }
+        function playClickSFX() { playSynthSound([650], 0.08); }
+        function playSuccessSFX() { playSynthSound([523, 659, 783, 1046], 0.15, 'triangle', 0.07); }
+        function playErrorSFX() { playSynthSound([200, 160], 0.25, 'sawtooth', 0.08); }
+        function playFlipSFX() { playSynthSound([420, 560], 0.1, 'sine', 0.03); }
+
+        const themes = {
+            kitchen: { grad: "from-orange-500 via-amber-500 to-orange-600", text: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", button: "bg-orange-600 hover:bg-orange-700", accentLight: "bg-orange-100", accentText: "text-orange-700", accentSub: "text-orange-500", badge: "text-orange-600 bg-orange-50" },
+            animals: { grad: "from-emerald-500 via-teal-500 to-emerald-600", text: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", button: "bg-emerald-600 hover:bg-emerald-700", accentLight: "bg-emerald-100", accentText: "text-emerald-700", accentSub: "text-emerald-500", badge: "text-emerald-600 bg-emerald-50" },
+            space: { grad: "from-purple-600 via-indigo-500 to-purple-700", text: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200", button: "bg-purple-600 hover:bg-purple-700", accentLight: "bg-purple-100", accentText: "text-purple-700", accentSub: "text-purple-500", badge: "text-purple-600 bg-purple-50" },
+            routine: { grad: "from-rose-500 via-pink-500 to-rose-600", text: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200", button: "bg-rose-600 hover:bg-rose-700", accentLight: "bg-rose-100", accentText: "text-rose-700", accentSub: "text-rose-500", badge: "text-rose-600 bg-rose-50" }
+        };
+
+        const categories = {
+            kitchen: [
+                { word: "Chef", spanish: "Cocinero/a", img: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=400&q=80" },
+                { word: "Kitchen", spanish: "Cocina", img: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=400&q=80" },
+                { word: "Apple", spanish: "Manzana", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&q=80" },
+                { word: "Bread", spanish: "Pan", img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80" },
+                { word: "Water", spanish: "Agua", img: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=400&q=80" },
+                { word: "Pizza", spanish: "Pizza", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" },
+                { word: "Ice Cream", spanish: "Helado", img: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?auto=format&fit=crop&w=400&q=80" },
+                { word: "Cake", spanish: "Pastel", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80" }
+            ],
+            animals: [
+                { word: "Lion", spanish: "León", img: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=400&q=80" },
+                { word: "Monkey", spanish: "Mono", img: "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?auto=format&fit=crop&w=400&q=80" },
+                { word: "Tiger", spanish: "Tigre", img: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=400&q=80" },
+                { word: "Giraffe", spanish: "Jirafa", img: "https://images.unsplash.com/photo-1547721064-da6cfb341d50?auto=format&fit=crop&w=400&q=80" },
+                { word: "Bear", spanish: "Oso", img: "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=400&q=80" },
+                { word: "Cat", spanish: "Gato", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&q=80" }
+            ],
+            space: [
+                { word: "Rocket", spanish: "Cohete", img: "https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=400&q=80" },
+                { word: "Planet", spanish: "Planeta", img: "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=400&q=80" },
+                { word: "Star", spanish: "Estrella", img: "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?auto=format&fit=crop&w=400&q=80" },
+                { word: "Moon", spanish: "Luna", img: "https://images.unsplash.com/photo-1522030299830-16b8d3d049fe?auto=format&fit=crop&w=400&q=80" },
+                { word: "Galaxy", spanish: "Galaxia", img: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=400&q=80" }
+            ],
+            routine: [
+                { word: "School", spanish: "Colegio", img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=400&q=80" },
+                { word: "Study", spanish: "Estudiar", img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=400&q=80" },
+                { word: "Lunch", spanish: "Almorzar", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80" },
+                { word: "Play", spanish: "Jugar", img: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=400&q=80" },
+                { word: "Read", spanish: "Leer", img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80" },
+                { word: "Sleep", spanish: "Dormir", img: "https://images.unsplash.com/photo-1511295742364-927d44160b27?auto=format&fit=crop&w=400&q=80" },
+                { word: "Wash hands", spanish: "Lavarse las manos", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=400&q=80" },
+                { word: "Exercise", spanish: "Hacer ejercicio", img: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=400&q=80" }
+            ]
+        };
+
+        let currentCategory = 'kitchen', currentMode = 'flashcard', flashcardIndex = 0, quizIndex = 0, quizScore = 0, quizStreak = 0, isCardFlipped = false;
+
+        function showSpinner() { const s = document.getElementById('image-loading-spinner'); if(s) { s.style.display='flex'; s.classList.remove('opacity-0'); } }
+        function hideSpinner() { const s = document.getElementById('image-loading-spinner'); if(s) { s.classList.add('opacity-0'); setTimeout(()=>s.style.display='none',300); } }
+        function handleImageError() { hideSpinner(); document.getElementById('flashcard-photo').src = `https://placehold.co/400?text=Error`; }
+
+        function applyTheme() {
+            const t = themes[currentCategory];
+            document.getElementById('app-header').className = `bg-gradient-to-r ${t.grad} text-white text-center py-8 px-4 shadow-lg transition-all duration-500`;
+            document.getElementById('flashcard-image-container').className = `w-56 h-56 rounded-2xl bg-slate-100 overflow-hidden relative shadow-inner mb-4 border-4 ${t.border}`;
+            document.getElementById('flashcard-back-face').className = `card-face backface-hidden rotate-y-180 absolute w-full h-full rounded-3xl ${t.bg} border-4 ${t.border} shadow-xl flex flex-col justify-between p-6 transition-all duration-500`;
+            document.getElementById('backface-icon-container').className = `w-24 h-24 rounded-full ${t.accentLight} flex items-center justify-center ${t.text} mb-6`;
+            document.getElementById('word-es').className = `text-4xl font-extrabold tracking-tight ${t.accentText}`;
+            document.getElementById('main-audio-btn').className = `${t.button} text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-all duration-500`;
+            document.getElementById('main-next-btn').className = `flex-1 ${t.button} text-white font-bold py-4 px-6 rounded-2xl transition duration-500`;
+            document.getElementById('flashcard-progress-bar').className = `${t.button} h-2 rounded-full transition-all duration-500`;
+            document.getElementById('quiz-progress-bar').className = `${t.button} h-2 rounded-full transition-all duration-500`;
+            document.getElementById('quiz-score').className = `text-sm font-bold ${t.badge} px-3 py-1.5 rounded-full`;
+            document.getElementById('quiz-streak').className = `text-sm font-bold ${t.badge} px-3 py-1.5 rounded-full`;
+            document.getElementById('quiz-audio-btn').className = `${t.button} text-white rounded-full w-10 h-10 flex items-center justify-center shadow-md active:scale-95`;
+            document.getElementById('modal-score').className = `text-2xl font-black ${t.text}`;
+            document.getElementById('modal-close-btn').className = `w-full mt-6 ${t.button} text-white font-extrabold py-4 px-6 rounded-2xl shadow-lg`;
+            document.getElementById('modal-emoji-frame').className = `w-20 h-20 ${t.bg} ${t.text} rounded-full flex items-center justify-center mx-auto mb-6 text-3xl animate-bounce`;
+        }
+
+        function changeCategory(c) { playClickSFX(); currentCategory = c; document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active')); document.getElementById(`cat-${c}`).classList.add('active'); reset(); }
+        function reset() { flashcardIndex = 0; quizIndex = 0; quizScore = 0; quizStreak = 0; isCardFlipped = false; document.getElementById('flashcard').classList.remove('rotate-y-180'); updateFlashcard(); initQuiz(); applyTheme(); }
+        function switchMode(m) { playClickSFX(); currentMode = m; document.getElementById('mode-flashcard-btn').classList.toggle('active', m==='flashcard'); document.getElementById('mode-quiz-btn').classList.toggle('active', m==='quiz'); document.getElementById('panel-flashcard').classList.toggle('hidden', m==='quiz'); document.getElementById('panel-quiz').classList.toggle('hidden', m==='flashcard'); reset(); }
+
+        function updateFlashcard() {
+            const item = categories[currentCategory][flashcardIndex];
+            showSpinner();
+            document.getElementById('word-en').innerText = item.word;
+            document.getElementById('word-es').innerText = item.spanish;
+            document.getElementById('flashcard-photo').src = item.img;
+            document.getElementById('flashcard-progress-bar').style.width = `${((flashcardIndex+1)/categories[currentCategory].length)*100}%`;
+            document.getElementById('flashcard-counter').innerText = `Card ${flashcardIndex+1} of ${categories[currentCategory].length}`;
+            setTimeout(() => speak(item.word), 350);
+        }
+
+        function toggleFlip() { playFlipSFX(); isCardFlipped = !isCardFlipped; document.getElementById('flashcard').classList.toggle('rotate-y-180', isCardFlipped); }
+        function speakCurrentWord(e) { if(e) e.stopPropagation(); speak(categories[currentCategory][flashcardIndex].word); }
+        function nextWord() { playClickSFX(); isCardFlipped = false; document.getElementById('flashcard').classList.remove('rotate-y-180'); setTimeout(() => { flashcardIndex = (flashcardIndex + 1) % categories[currentCategory].length; updateFlashcard(); }, 150); }
+        function prevWord() { playClickSFX(); isCardFlipped = false; document.getElementById('flashcard').classList.remove('rotate-y-180'); setTimeout(() => { flashcardIndex = (flashcardIndex - 1 + categories[currentCategory].length) % categories[currentCategory].length; updateFlashcard(); }, 150); }
+
+        function speak(t) { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = document.getElementById('accent-selector').value; u.rate = parseFloat(document.getElementById('speed-selector').value); window.speechSynthesis.speak(u); } }
+
+        function initQuiz() {
+            const list = categories[currentCategory];
+            if (quizIndex >= list.length) { celebrate(); return; }
+            const cur = list[quizIndex];
+            document.getElementById('quiz-question-word').innerText = cur.word;
+            document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
+            document.getElementById('quiz-streak').innerText = `Streak: 🔥 ${quizStreak}`;
+            let opts = [cur, ...list.filter(i=>i.word!==cur.word).sort(()=>0.5-Math.random()).slice(0,3)].sort(()=>0.5-Math.random());
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            opts.forEach(o => {
+                const b = document.createElement('button');
+                b.className = 'bg-white border-2 border-slate-200 rounded-2xl p-4 hover:border-slate-400 active:scale-95 transition-all shadow-sm flex flex-col items-center gap-2';
+                b.onclick = () => check(o, b);
+                b.innerHTML = `<div class="w-24 h-24 rounded-xl overflow-hidden shadow-inner"><img class="w-full h-full object-cover" src="${o.img}"></div><span class="font-bold text-slate-700">${o.spanish}</span>`;
+                container.appendChild(b);
+            });
+            document.getElementById('quiz-progress-bar').style.width = `${((quizIndex+1)/list.length)*100}%`;
+            document.getElementById('quiz-counter').innerText = `Question ${quizIndex+1} of ${list.length}`;
+            setTimeout(() => speak(cur.word), 350);
+        }
+
+        function speakQuizWord() { speak(categories[currentCategory][quizIndex].word); }
+        function check(o, b) {
+            const cur = categories[currentCategory][quizIndex];
+            document.querySelectorAll('#options-container button').forEach(btn => btn.style.pointerEvents = 'none');
+            if (o.word === cur.word) { playSuccessSFX(); b.classList.add('border-emerald-500', 'bg-emerald-50'); quizScore += 10 + (quizStreak * 2); quizStreak++; }
+            else { playErrorSFX(); b.classList.add('border-rose-500', 'bg-rose-50'); quizStreak = 0; }
+            setTimeout(() => { quizIndex++; initQuiz(); }, 1500);
+        }
+
+        function celebrate() { playSuccessSFX(); confettiArr = []; for(let i=0; i<150; i++) confettiArr.push(new Confetto()); cancelAnimationFrame(animId); animConfetti(); document.getElementById('modal-score').innerText = `${quizScore} pts`; document.getElementById('modal-message').innerText = `Unit "${currentCategory.toUpperCase()}" finished!`; document.getElementById('celebration-modal').classList.remove('hidden'); setTimeout(()=>document.getElementById('celebration-modal').classList.add('opacity-100'),50); }
+        function closeModal() { document.getElementById('celebration-modal').classList.remove('opacity-100'); setTimeout(()=>{ document.getElementById('celebration-modal').classList.add('hidden'); switchMode('flashcard'); },300); }
+
+        const canvas = document.getElementById('confetti-canvas'), ctx = canvas.getContext('2d');
+        let confettiArr = [], animId;
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        class Confetto { constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height-canvas.height; this.r = Math.random()*6+4; this.d = Math.random()*canvas.height; this.color = `hsl(${Math.random()*360},90%,65%)`; this.tilt = Math.random()*10-5; this.tiltAngleIncremental = Math.random()*0.07+0.02; this.tiltAngle = 0; } draw() { ctx.beginPath(); ctx.lineWidth = this.r/2; ctx.strokeStyle = this.color; ctx.moveTo(this.x+this.tilt+this.r/4, this.y); ctx.lineTo(this.x+this.tilt, this.y+this.tilt+this.r/4); ctx.stroke(); } }
+        function animConfetti() { ctx.clearRect(0,0,canvas.width,canvas.height); let active = false; confettiArr.forEach(c => { c.tiltAngle += c.tiltAngleIncremental; c.y += (Math.cos(c.d)+3+c.r/2)/2; c.x += Math.sin(c.tiltAngle); c.tilt = Math.sin(c.tiltAngle-c.r/2)*15; if(c.y < canvas.height) active = true; c.draw(); }); if(active) animId = requestAnimationFrame(animConfetti); }
+
+        window.onload = () => { updateFlashcard(); applyTheme(); };
+    </script>
+</body>
+</html>
